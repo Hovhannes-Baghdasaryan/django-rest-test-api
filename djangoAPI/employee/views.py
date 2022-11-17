@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Employee, Departments
-from .serializers import EmployeeSerializer, DepartmentSerializers
+from .models import Departments
+from .serializers import DepartmentSerializers
 
 
 @api_view(["GET"])
