@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
@@ -23,7 +24,7 @@ def getDepartmentDetail(request, departmentId):
         return Response(department_serializer.data)
     except Exception as err:
 
-        raise ValidationError(detail=err)
+        return JsonResponse({'error': str(err), 'status': status.HTTP_400_BAD_REQUEST},status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
@@ -33,9 +34,10 @@ def createDepartment(request):
     if serializer.is_valid():
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse({"data": serializer.data, 'status': status.HTTP_201_CREATED}, status=status.HTTP_201_CREATED)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({'error': serializer.errors["DepartmentName"][0], 'status': status.HTTP_400_BAD_REQUEST},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -48,4 +50,5 @@ def departmentDelete(request, departmentId):
         return Response(serialized_detail.data, status=status.HTTP_202_ACCEPTED)
 
     except Exception as err:
-       raise ValidationError(detail=err)
+        return JsonResponse({'error': str(err), 'status': status.HTTP_400_BAD_REQUEST},
+                            status=status.HTTP_400_BAD_REQUEST)
