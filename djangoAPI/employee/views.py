@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from .models import Departments
@@ -39,6 +38,22 @@ def createDepartment(request):
     return JsonResponse({'error': serializer.errors["DepartmentName"][0], 'status': status.HTTP_400_BAD_REQUEST},
                         status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(["PUT"])
+def updateDepartment(request, departmentId):
+    try:
+        departmentItem = Departments.objects.get(pk=departmentId)
+        serializer = DepartmentSerializers(departmentItem, data=request.data)
+
+    except Exception as err:
+        return JsonResponse({'newData': str(err), 'status': status.HTTP_400_BAD_REQUEST},status=status.HTTP_400_BAD_REQUEST)
+
+    if serializer.is_valid():
+        serializer.save()
+
+        return JsonResponse({'update': serializer.data, 'status': status.HTTP_202_ACCEPTED}, status=status.HTTP_200_OK)
+
+    return JsonResponse({'newData': serializer.errors["DepartmentName"][0], 'status': status.HTTP_400_BAD_REQUEST}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["DELETE"])
 def departmentDelete(request, departmentId):
