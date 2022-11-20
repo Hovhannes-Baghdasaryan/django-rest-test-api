@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .models import Departments, Employee
-from .serializers import DepartmentSerializers, EmployeeSerializer, CreateEmployeeSerializer
+from .serializers import DepartmentSerializers, EmployeeSerializer, CreateEmployeeSerializer, \
+    IncrementCountDepartmentSerializers, DeleteDepartmentSerializers, CreateDepartmentSerializers
 
 
 @api_view(["GET"])
@@ -19,25 +20,33 @@ def createEmployees(request, departmentId):
     try:
         final_request_data = {**request.data, "DepartmentForeignId": departmentId}
 
+        departmentItem = Departments.objects.get(pk=departmentId)
+
+        edit_department_employee_count_data = {
+            "EmployeeCount": departmentItem.EmployeeCount + 1
+        }
+
+        department_serializer = IncrementCountDepartmentSerializers(departmentItem, data=edit_department_employee_count_data)
         employee_serializer = CreateEmployeeSerializer(data=final_request_data)
-
-        if employee_serializer.is_valid():
-            employee_serializer.save()
-
-            final_show_data = {
-                "EmployeeId": employee_serializer.data["EmployeeId"],
-                "EmployeeName": employee_serializer.data["EmployeeName"],
-            }
-
-            return JsonResponse({'data': final_show_data, 'status': status.HTTP_201_CREATED},
-                                status=status.HTTP_201_CREATED)
-
-        return JsonResponse({'message': employee_serializer.errors, 'status': status.HTTP_400_BAD_REQUEST},
-                            status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as err:
 
-        return JsonResponse({'mes': str(err), 'status': status.HTTP_400_BAD_REQUEST}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'mes': str(err), 'status': status.HTTP_400_BAD_REQUEST},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    if employee_serializer.is_valid() and department_serializer.is_valid():
+        employee_serializer.save()
+        department_serializer.save()
+
+        final_show_data = {
+            "EmployeeName": employee_serializer.data["EmployeeName"],
+        }
+
+        return JsonResponse({'data': final_show_data, 'status': status.HTTP_201_CREATED},
+                            status=status.HTTP_201_CREATED)
+
+    return JsonResponse({'message': employee_serializer.errors or department_serializer.errors, 'status': status.HTTP_400_BAD_REQUEST},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -50,12 +59,13 @@ def getDepartmentDetail(_, departmentId):
 
     except Exception as err:
 
-        return JsonResponse({'error': str(err), 'status': status.HTTP_400_BAD_REQUEST}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': str(err), 'status': status.HTTP_400_BAD_REQUEST},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
 def createDepartment(request):
-    serializer = DepartmentSerializers(data=request.data)
+    serializer = CreateDepartmentSerializers(data=request.data)
 
     if serializer.is_valid():
         serializer.save()
@@ -87,10 +97,10 @@ def updateDepartment(request, departmentId):
 
 
 @api_view(["DELETE"])
-def departmentDelete(request, departmentId):
+def departmentDelete(_, departmentId):
     try:
         departmentDetail = Departments.objects.get(pk=departmentId)
-        serialized_detail = DepartmentSerializers(departmentDetail)
+        serialized_detail = DeleteDepartmentSerializers(departmentDetail)
         departmentDetail.delete()
 
         return Response(serialized_detail.data, status=status.HTTP_202_ACCEPTED)

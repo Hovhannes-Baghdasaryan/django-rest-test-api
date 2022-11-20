@@ -5,7 +5,25 @@ from rest_framework import serializers
 class DepartmentSerializers(serializers.ModelSerializer):
     class Meta:
         model = Departments
-        fields = ('DepartmentId', 'DepartmentName', "EmployeeCount")
+        fields = "__all__"
+
+
+class CreateDepartmentSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Departments
+        fields = ("DepartmentName", )
+
+
+class DeleteDepartmentSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Departments
+        fields = ('DepartmentName', "EmployeeCount")
+
+
+class IncrementCountDepartmentSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Departments
+        fields = ("EmployeeCount",)
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -17,4 +35,4 @@ class EmployeeSerializer(serializers.ModelSerializer):
 class CreateEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = "__all__"
+        fields = ("EmployeeName", "DepartmentForeignId")

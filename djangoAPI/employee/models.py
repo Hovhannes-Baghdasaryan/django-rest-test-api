@@ -6,9 +6,6 @@ class Departments(models.Model):
     DepartmentName = models.CharField(max_length=40)
     EmployeeCount = models.IntegerField(auto_created=True, default=0)
 
-    def __str__(self):
-        return f"{self.EmployeeCount}"
-
 
 class Employee(models.Model):
     EmployeeId = models.AutoField(primary_key=True)
