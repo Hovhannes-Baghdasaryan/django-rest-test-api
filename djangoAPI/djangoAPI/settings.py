@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'employee.apps.EmployeeConfig',
+    'drf_yasg',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'djangoAPI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

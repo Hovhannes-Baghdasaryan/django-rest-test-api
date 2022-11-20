@@ -1,11 +1,30 @@
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 from .models import Departments, Employee
 from .serializers import DepartmentSerializers, EmployeeSerializer, CreateEmployeeSerializer, \
     IncrementCountDepartmentSerializers, DeleteDepartmentSerializers, CreateDepartmentSerializers
+
+from drf_yasg import openapi
+
+
+@method_decorator(name="get", decorator=swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter(
+            'post_slug', openapi.IN_QUERY,
+            description=("Employee of a single department"),
+            type=openapi.TYPE_STRING
+        )
+    ]
+))
+class PingView(APIView):
+    def get(self, *args, **kwargs):
+        return Response([{'ping': 'pong'}], status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -26,7 +45,8 @@ def createEmployees(request, departmentId):
             "EmployeeCount": departmentItem.EmployeeCount + 1
         }
 
-        department_serializer = IncrementCountDepartmentSerializers(departmentItem, data=edit_department_employee_count_data)
+        department_serializer = IncrementCountDepartmentSerializers(departmentItem,
+                                                                    data=edit_department_employee_count_data)
         employee_serializer = CreateEmployeeSerializer(data=final_request_data)
 
     except Exception as err:
@@ -45,8 +65,9 @@ def createEmployees(request, departmentId):
         return JsonResponse({'data': final_show_data, 'status': status.HTTP_201_CREATED},
                             status=status.HTTP_201_CREATED)
 
-    return JsonResponse({'message': employee_serializer.errors or department_serializer.errors, 'status': status.HTTP_400_BAD_REQUEST},
-                        status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse(
+        {'message': employee_serializer.errors or department_serializer.errors, 'status': status.HTTP_400_BAD_REQUEST},
+        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])

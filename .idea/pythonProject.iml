@@ -6,5 +6,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (django-rest-test-api)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="swagger-ui" level="application" />
+    <orderEntry type="library" name="swagger-ui-bundle" level="application" />
   </component>
 </module>

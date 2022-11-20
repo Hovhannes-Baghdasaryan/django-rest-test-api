@@ -8,5 +8,6 @@ urlpatterns = [
     path('department/<departmentId>/delete', views.departmentDelete),
     path('department/<departmentId>/update', views.updateDepartment),
     path('department/<departmentId>/employee', views.getAllEmployees),
-    path('department/<departmentId>/employee/create', views.createEmployees)
+    path('department/<departmentId>/employee/create', views.createEmployees),
+    path('test/', views.PingView.as_view())
 ]
